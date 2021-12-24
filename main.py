@@ -1,10 +1,12 @@
 import pygame
 
+DATA = "YP_data"
+
 
 class Board:
     """Класс доски"""
 
-    def __init__(self, filename='YP_data/Levels/level_1.txt'):
+    def __init__(self, filename=f'{DATA}/Levels/level_1.txt'):
         with open(filename, 'r') as level_txt:
             data = level_txt.read()
         # Создание матрицы уровня
@@ -17,19 +19,19 @@ class Board:
             for x in range(len(self.level_map[y])):
                 if self.level_map[y][x] == '.':
                     # self.level_map[y][x] = -1
-                    data = (x, y), 'YP_data/Textures/grass.png', (50, 50)
+                    data = (x, y), f'{DATA}/Textures/grass.png', (50, 50)
                     obj = Obstacle(data)
                     all_sprites.add(obj)
                     all_obstacles.add(obj)
                 elif self.level_map[y][x] == '@':
                     # self.level_map[y][x] = 0
-                    data = ((x, y), 'YP_data/Textures/grass.png', (50, 50))
+                    data = ((x, y), f'{DATA}/Textures/grass.png', (50, 50))
                     obj = Obstacle(data)
                     all_sprites.add(obj)
                     all_obstacles.add(obj)
                 elif self.level_map[y][x] == '#':
                     # self.level_map[y][x] = 1
-                    data = (x, y), 'YP_data/Textures/box.png', (50, 50)
+                    data = (x, y), f'{DATA}/Textures/box.png', (50, 50)
                     obj = Obstacle(data)
                     all_sprites.add(obj)
                     all_obstacles.add(obj)
@@ -47,7 +49,7 @@ class Board:
 class Player(pygame.sprite.Sprite):
     """Класс игрока"""
 
-    def __init__(self, data=((0, 6), 'YP_data/Textures/mar.png', (160 * 5, 90 * 5))):
+    def __init__(self, data=((0, 6), f'{DATA}/Textures/mar.png', (160 * 5, 90 * 5))):
         pygame.sprite.Sprite.__init__(self)
         print(data)
         (self.x, self.y), filename, (self.width, self.height) = data
@@ -83,7 +85,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.speed_y
 
     def ask_speed(self):
-        return (self.speed_x, self.speed_y)
+        return self.speed_x, self.speed_y
 
 
 class Camera:
@@ -106,7 +108,7 @@ class Enemy(pygame.sprite.Sprite):
 class Obstacle(pygame.sprite.Sprite):
     """Класс препядствия"""
 
-    def __init__(self, data=((0, 0), 'YP_data/Textures/mar.png', (160 * 5, 90 * 5))):
+    def __init__(self, data=((0, 0), f'{DATA}/Textures/mar.png', (160 * 5, 90 * 5))):
         pygame.sprite.Sprite.__init__(self)
         (self.x, self.y), filename, (self.width, self.height) = data
         self.image = pygame.image.load(filename).convert_alpha()
