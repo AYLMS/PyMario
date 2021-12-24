@@ -5,10 +5,8 @@ class Board:
     """Класс доски"""
 
     def __init__(self, filename='YP_data/Levels/level_1.txt'):
-        # Открытие файла
-        level_txt = open(filename, 'r')
-        data = level_txt.read()
-        level_txt.close()
+        with open(filename, 'r') as level_txt:
+            data = level_txt.read()
         # Создание матрицы уровня
         self.level_map = []
         for row in data.split('\n'):
@@ -17,22 +15,21 @@ class Board:
         print(len(self.level_map), len(self.level_map[-1]))
         for y in range(len(self.level_map)):
             for x in range(len(self.level_map[y])):
-                if self.level_map[y][x] != '.' or self.level_map[y][x] == '':
-                    if self.level_map[y][x] == '@':
-                        # self.level_map[y][x] = 0
-                        data = ((x, y), 'YP_data/Textures/grass.png', (50, 50))
-                        obj = Obstacle(data)
-                        all_sprites.add(obj)
-                        all_obstacles.add(obj)
-                    elif self.level_map[y][x] == '#':
-                        # self.level_map[y][x] = 1
-                        data = (x, y), 'YP_data/Textures/box.png', (50, 50)
-                        obj = Obstacle(data)
-                        all_sprites.add(obj)
-                        all_obstacles.add(obj)
-                else:
+                if self.level_map[y][x] == '.':
                     # self.level_map[y][x] = -1
                     data = (x, y), 'YP_data/Textures/grass.png', (50, 50)
+                    obj = Obstacle(data)
+                    all_sprites.add(obj)
+                    all_obstacles.add(obj)
+                elif self.level_map[y][x] == '@':
+                    # self.level_map[y][x] = 0
+                    data = ((x, y), 'YP_data/Textures/grass.png', (50, 50))
+                    obj = Obstacle(data)
+                    all_sprites.add(obj)
+                    all_obstacles.add(obj)
+                elif self.level_map[y][x] == '#':
+                    # self.level_map[y][x] = 1
+                    data = (x, y), 'YP_data/Textures/box.png', (50, 50)
                     obj = Obstacle(data)
                     all_sprites.add(obj)
                     all_obstacles.add(obj)
