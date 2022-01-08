@@ -128,7 +128,6 @@ screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 # Прямо ваапще все спрайты
 all_sprites = pygame.sprite.Group()
-# Спрайты препятсвий
 all_obstacles = pygame.sprite.Group()
 # Спрайты врагов
 # Спрайт игрока
