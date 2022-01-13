@@ -59,7 +59,6 @@ class Player(pygame.sprite.Sprite):
             if self.speed_y < 15:
                 self.speed_y += 1
         elif pygame.key.get_pressed()[pygame.K_UP]:
-            print('хуй')
             self.speed_y = -15
         else:
             self.speed_y = 0
@@ -81,21 +80,21 @@ class Lrud(pygame.sprite.Sprite):
         self.speed_y = 0
         self.cmfcs = False
         if self.axis == 0:
-            self.image = pygame.Surface((78, 1))
-            self.image.fill((255, 0, 0))
+            self.image = pygame.Surface((46, 1))
+            self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 -1))
         elif self.axis == 1:
             self.image = pygame.Surface((1, 78))
-            self.image.fill((0, 255, 0))
-            self.rect = self.image.get_rect(center=(self.x * 80 + 81, self.y * 80 + 40))
+            self.image.set_colorkey((0, 0, 0))
+            self.rect = self.image.get_rect(center=(self.x * 80 + 64, self.y * 80 + 40))
         elif self.axis == 2:
-            self.image = pygame.Surface((78, 1))
-            self.image.fill((0, 0, 255))
+            self.image = pygame.Surface((46, 1))
+            self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 81))
         elif self.axis == 3:
             self.image = pygame.Surface((1, 78))
-            self.image.fill((255, 0, 255))
-            self.rect = self.image.get_rect(center=(self.x * 80 -1, self.y * 80 + 40))
+            self.image.set_colorkey((0, 0, 0))
+            self.rect = self.image.get_rect(center=(self.x * 80 + 16, self.y * 80 + 40))
 
     def update(self):
         if not self.cmfcs:
