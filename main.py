@@ -73,28 +73,28 @@ class Player(pygame.sprite.Sprite):
 
 
 class Lrud(pygame.sprite.Sprite):
-    def __init__(self, data=((0, 0), (160*8, 90*8), 1)):
+    def __init__(self, data=((0, 0), (160*8, 90*8), (48, 80), 1)):
         pygame.sprite.Sprite.__init__(self)
-        (self.x, self.y), (self.width, self.height), self.axis = data
+        (self.x, self.y), (self.width, self.height), (self.objsx, self.objsy), self.axis = data
         self.speed_x = 0
         self.speed_y = 0
         self.cmfcs = False
         if self.axis == 0:
             self.image = pygame.Surface((46, 1))
-            self.image.set_colorkey((0, 0, 0))
-            self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 -1))
+            #self.image.set_colorkey((0, 0, 0))
+            self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40 - int(self.objsy/2) - 1))
         elif self.axis == 1:
             self.image = pygame.Surface((1, 78))
-            self.image.set_colorkey((0, 0, 0))
-            self.rect = self.image.get_rect(center=(self.x * 80 + 64, self.y * 80 + 40))
+            #self.image.set_colorkey((0, 0, 0))
+            self.rect = self.image.get_rect(center=(self.x * 80 + 40 + int(self.objsx/2), self.y * 80 + 40))
         elif self.axis == 2:
             self.image = pygame.Surface((46, 1))
-            self.image.set_colorkey((0, 0, 0))
-            self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 81))
+            #self.image.set_colorkey((0, 0, 0))
+            self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40 + int(self.objsy/2) + 1))
         elif self.axis == 3:
             self.image = pygame.Surface((1, 78))
-            self.image.set_colorkey((0, 0, 0))
-            self.rect = self.image.get_rect(center=(self.x * 80 + 16, self.y * 80 + 40))
+            #self.image.set_colorkey((0, 0, 0))
+            self.rect = self.image.get_rect(center=(self.x * 80 + 40 - int(self.objsx/2), self.y * 80 + 40))
 
     def update(self):
         if not self.cmfcs:
@@ -124,6 +124,16 @@ class Obstacle(pygame.sprite.Sprite):
         dx, dy = data
         self.rect.x += dx
         self.rect.y += dy
+
+
+class Coin(pygame.sprite.Sprite):
+    def __init__(self, data=((0, 0), 'YP_data/Textures/coin.png', (160*8, 90*8))):
+        pygame.sprite.Sprite.__init__(self)
+        (self.x, self.y), filename, (self.width, self.height) = data
+        self.image = pygame.image.load(filename).convert_alpha()
+        self.rect = self.image.get_rect(center=(self.x * self.width + self.width / 2, self.y * self.height + self.height / 2))
+        '''Маска для колизий'''
+        self.mask = pygame.mask.from_surface(self.image)
 
 
 class Camera:
@@ -166,7 +176,7 @@ def LoadLvL(lvl=1):
                 all_entities.add(pl)
                 all_sprites.add(pl)
                 for i in range(4):
-                    data = ((x, y), (160*8, 90*8), i)
+                    data = ((x, y), (160*8, 90*8), (48, 80), i)
                     helper = Lrud(data)
                     helpers.add(helper)
                     all_sprites.add(helper)
@@ -177,6 +187,12 @@ def LoadLvL(lvl=1):
                 obj = Obstacle(data)
                 all_obstacles.add(obj)
                 all_sprites.add(obj)
+            elif lvl_map[y][x] == 'C':
+                data = ((x, y), 'YP_data/Textures/coin.png', (36, 60))
+                lvl_map[y][x] = data
+                coin = Coin(data)
+                all_sprites.add(coin)
+                coins.add(coin)
 
 
 pygame.init()
@@ -199,6 +215,9 @@ all_entities = pygame.sprite.Group()
 # Спрайт игрока
 players = pygame.sprite.Group()
 helpers = pygame.sprite.Group()
+# Спрайты монет и подобного фуфла
+coins = pygame.sprite.Group()
+all_shit = pygame.sprite.Group()
 '''Предустановки к игровому циклу'''
 # Подгрузка уровня
 LoadLvL(lvl)
