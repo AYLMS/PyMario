@@ -175,14 +175,14 @@ class EndScreen(pygame.sprite.Sprite):
         self.width, self.height = size
         self.image = pygame.image.load(filename).convert_alpha()
         self.rect = self.image.get_rect(center=(0 - self.width, self.height / 2))
-        self.dx = 1
+        self.dx = 16
         self.gn = True
 
     def update(self):
         if self.gn:
             self.rect.x += self.dx
             if self.rect.right >= self.width:
-                self.rect.right == self.width
+                self.rect.right = self.width
                 self.gn = False
 
 
@@ -272,6 +272,7 @@ while running:
         if event.type == pygame.KEYDOWN:
             if end:
                 running = False
+                break
             if event.key == pygame.K_SPACE:
                 for obj in players:
                     if obj.cmfcs:
@@ -305,6 +306,8 @@ while running:
         end = True
         es = EndScreen("YP_data/Textures/endscreen.png", (16*80, 9*80))
         all_sprites.add(es)
+        all_entities.add(es)
+        print(es)
     pygame.display.flip()
 '''Конец игрового цикла'''
 pygame.quit()
