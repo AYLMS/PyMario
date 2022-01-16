@@ -81,6 +81,10 @@ class Player(pygame.sprite.Sprite):
         screen.blit(self.text1, (15*80+40, 0))
         self.rect.y += self.speed_y
         self.rect.x += self.speed_x
+        if self.rect.centery > 90*8:
+            print('lol')
+            for obj in all_sprites:
+                obj.kill()
 
     def move(self, data=(0, 0)):
         dx, dy = data
@@ -165,6 +169,23 @@ class Camera:
             object.rect.y += -dy
 
 
+class EndScreen(pygame.sprite.Sprite):
+    def __init__(self, filename, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.width, self.height = size
+        self.image = pygame.image.load(filename).convert_alpha()
+        self.rect = self.image.get_rect(center=(0 - self.width, self.height / 2))
+        self.dx = 1
+        self.gn = True
+
+    def update(self):
+        if self.gn:
+            self.rect.x += self.dx
+            if self.rect.right >= self.width:
+                self.rect.right == self.width
+                self.gn = False
+
+
 def LoadLvL(lvl=1):
     lvlname = f'YP_data/Levels/level_{lvl}.txt'
     print('Очистка прошлого уровня')
@@ -241,6 +262,7 @@ LoadLvL(lvl)
 '''cam = Camera()'''
 screen.fill((192, 192, 255))
 running = True
+end = False
 '''Игровой цикл'''
 while running:
     # Установка частоты обновления
@@ -248,6 +270,8 @@ while running:
     '''Цикл действий'''
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
+            if end:
+                running = False
             if event.key == pygame.K_SPACE:
                 for obj in players:
                     if obj.cmfcs:
@@ -277,6 +301,10 @@ while running:
     helpers.update()
     '''for obj in all_obstacles:
         obj.move((-10, 0))'''
+    if not all_sprites:
+        end = True
+        es = EndScreen("YP_data/Textures/endscreen.png", (16*80, 9*80))
+        all_sprites.add(es)
     pygame.display.flip()
 '''Конец игрового цикла'''
 pygame.quit()
