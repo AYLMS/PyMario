@@ -21,6 +21,10 @@ class Player(pygame.sprite.Sprite):
         '''Спрайты для столкновений бить пж пж пж'''
         '''self.sdown = pygame.Surface((80, 1))
         self.sdr = self.sdown.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40))'''
+        self.f1 = pygame.font.Font(None, 36)
+        self.score = 0
+        self.text1 = self.f1.render(f'{self.score}', True,
+                          (180, 180, 180))
         self.left = True
         self.cmfcs = False
         self.cl = [False, False, False, False]
@@ -37,12 +41,18 @@ class Player(pygame.sprite.Sprite):
         elif pygame.key.get_pressed()[pygame.K_RIGHT]:
             if self.speed_x < 10:
                 self.speed_x += 2
+            if self.left:
+                self.left = False
+                self.image = pygame.transform.flip(self.image, True, False)
         '''Движение влево'''
         if self.cl[3] and self.speed_x < 2:
             self.speed_x += 2
         elif pygame.key.get_pressed()[pygame.K_LEFT]:
             if self.speed_x > -10:
                 self.speed_x += -2
+            if not self.left:
+                self.left = True
+                self.image = pygame.transform.flip(self.image, True, False)
         '''Торможение (Нехрен быть инертным)'''
         if self.cl[2]:
             if pygame.sprite.spritecollide(self, all_obstacles, False):
@@ -63,6 +73,12 @@ class Player(pygame.sprite.Sprite):
         else:
             self.speed_y = 0
         '''Столкновения'''
+        if pygame.sprite.groupcollide(players, coins, False, True):
+            self.score += 10
+            print(self.score)
+            self.text1 = self.f1.render(f'{self.score}', True,
+                                        (90, 90, 90))
+        screen.blit(self.text1, (15*80+40, 0))
         self.rect.y += self.speed_y
         self.rect.x += self.speed_x
 
@@ -81,19 +97,19 @@ class Lrud(pygame.sprite.Sprite):
         self.cmfcs = False
         if self.axis == 0:
             self.image = pygame.Surface((46, 1))
-            #self.image.set_colorkey((0, 0, 0))
+            self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40 - int(self.objsy/2) - 1))
         elif self.axis == 1:
             self.image = pygame.Surface((1, 78))
-            #self.image.set_colorkey((0, 0, 0))
+            self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40 + int(self.objsx/2), self.y * 80 + 40))
         elif self.axis == 2:
             self.image = pygame.Surface((46, 1))
-            #self.image.set_colorkey((0, 0, 0))
+            self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40 + int(self.objsy/2) + 1))
         elif self.axis == 3:
             self.image = pygame.Surface((1, 78))
-            #self.image.set_colorkey((0, 0, 0))
+            self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40 - int(self.objsx/2), self.y * 80 + 40))
 
     def update(self):
@@ -127,7 +143,7 @@ class Obstacle(pygame.sprite.Sprite):
 
 
 class Coin(pygame.sprite.Sprite):
-    def __init__(self, data=((0, 0), 'YP_data/Textures/coin.png', (160*8, 90*8))):
+    def __init__(self, data=((0, 0), 'YP_data/Textures/coin.png', (80, 80))):
         pygame.sprite.Sprite.__init__(self)
         (self.x, self.y), filename, (self.width, self.height) = data
         self.image = pygame.image.load(filename).convert_alpha()
@@ -188,7 +204,7 @@ def LoadLvL(lvl=1):
                 all_obstacles.add(obj)
                 all_sprites.add(obj)
             elif lvl_map[y][x] == 'C':
-                data = ((x, y), 'YP_data/Textures/coin.png', (36, 60))
+                data = ((x, y), 'YP_data/Textures/coin.png', (80, 80))
                 lvl_map[y][x] = data
                 coin = Coin(data)
                 all_sprites.add(coin)
