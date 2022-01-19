@@ -18,9 +18,6 @@ class Player(pygame.sprite.Sprite):
         '''Маска для колизий'''
         self.speed_x = 0
         self.speed_y = 0
-        '''Спрайты для столкновений бить пж пж пж'''
-        '''self.sdown = pygame.Surface((80, 1))
-        self.sdr = self.sdown.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40))'''
         self.f1 = pygame.font.Font(None, 36)
         self.score = score
         self.text1 = self.f1.render(f'{self.score}', True,
@@ -30,76 +27,77 @@ class Player(pygame.sprite.Sprite):
         self.cl = [False, False, False, False]
 
     def update(self):
-        if self.cmfcsx:
-            pass
-        for obj in helpers:
-            i, bool = obj.checkcollide()
-            self.cl[i] = bool
-        '''Движение вправо'''
-        if self.cl[1] and not self.cl[3]:
-            if self.speed_x > 1:
-                self.speed_x = -self.speed_x - 1
-            else:
-                self.speed_x += -1
-        elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-            if self.speed_x < 12:
-                self.speed_x += 2
-            if self.left:
-                self.left = False
-                self.image = pygame.transform.flip(self.image, True, False)
-        '''Help me brother i'm stuck!'''
-        if self.cl[0] and self.cl[1] and self.cl[2] and self.cl[3]:
-            if self.left:
-                c = 24
-            else:
-                c = -24
-            self.rect.x += c
+        if flags:
+            if self.cmfcsx:
+                pass
             for obj in helpers:
-                obj.rect.x += c
-        '''Движение влево'''
-        if self.cl[3] and not self.cl[1]:
-            if self.speed_x < -1:
-                self.speed_x = -self.speed_x + 1
-            else:
+                i, bool = obj.checkcollide()
+                self.cl[i] = bool
+            '''Движение вправо'''
+            if self.cl[1] and not self.cl[3]:
+                if self.speed_x > 1:
+                    self.speed_x = -self.speed_x - 1
+                else:
+                    self.speed_x += -1
+            elif pygame.key.get_pressed()[pygame.K_RIGHT]:
+                if self.speed_x < 12:
+                    self.speed_x += 2
+                if self.left:
+                    self.left = False
+                    self.image = pygame.transform.flip(self.image, True, False)
+            '''Help me brother i'm stuck!'''
+            if self.cl[0] and self.cl[1] and self.cl[2] and self.cl[3]:
+                if self.left:
+                    c = 24
+                else:
+                    c = -24
+                self.rect.x += c
+                for obj in helpers:
+                    obj.rect.x += c
+            '''Движение влево'''
+            if self.cl[3] and not self.cl[1]:
+                if self.speed_x < -1:
+                    self.speed_x = -self.speed_x + 1
+                else:
+                    self.speed_x += 1
+            elif pygame.key.get_pressed()[pygame.K_LEFT]:
+                if self.speed_x > -12:
+                    self.speed_x += -2
+                if not self.left:
+                    self.left = True
+                    self.image = pygame.transform.flip(self.image, True, False)
+            '''Торможение (Нехрен быть инертным)'''
+            if self.cl[0]:
+                self.speed_y = -self.speed_y
+            if self.speed_x > 0:
+                self.speed_x += -1
+            elif self.speed_x < 0:
                 self.speed_x += 1
-        elif pygame.key.get_pressed()[pygame.K_LEFT]:
-            if self.speed_x > -12:
-                self.speed_x += -2
-            if not self.left:
-                self.left = True
-                self.image = pygame.transform.flip(self.image, True, False)
-        '''Торможение (Нехрен быть инертным)'''
-        if self.cl[0]:
-            self.speed_y = -self.speed_y
-        if self.speed_x > 0:
-            self.speed_x += -1
-        elif self.speed_x < 0:
-            self.speed_x += 1
-        '''Свободное падение'''
-        if not self.cl[2]:
-            if self.speed_y < 20:
-                self.speed_y += 1
-        else:
-            self.speed_y = 0
-        if pygame.key.get_pressed()[pygame.K_UP] and (not self.cl[3] and not self.cl[1] and self.cl[2]):
-            self.speed_y = -20
-        if self.cl[2] and (self.cl[1] or self.cl[3]):
-            self.speed_y += -1
-        '''Столкновения'''
-        if pygame.sprite.groupcollide(players, coins, False, True):
-            self.score += 10
-            print(self.score)
-            self.text1 = self.f1.render(f'{self.score}', True,
-                                        (90, 90, 90))
-        screen.blit(self.text1, (15*80+40, 0))
-        self.rect.y += self.speed_y
-        self.rect.x += self.speed_x
-        if self.rect.centery > 90*8:
-            print('dead inside')
-            for obj in all_sprites:
-                obj.kill()
-        if pygame.sprite.groupcollide(players, flags, False, True):
-            print('nextlvl')
+            '''Свободное падение'''
+            if not self.cl[2]:
+                if self.speed_y < 20:
+                    self.speed_y += 1
+            else:
+                self.speed_y = 0
+            if pygame.key.get_pressed()[pygame.K_UP] and (not self.cl[3] and not self.cl[1] and self.cl[2]):
+                self.speed_y = -20
+            if self.cl[2] and (self.cl[1] or self.cl[3]):
+                self.speed_y += -1
+            '''Столкновения'''
+            if pygame.sprite.groupcollide(players, coins, False, True):
+                self.score += 10
+                print(self.score)
+                self.text1 = self.f1.render(f'{self.score}', True,
+                                            (90, 90, 90))
+            screen.blit(self.text1, (15*80+40, 0))
+            self.rect.y += self.speed_y
+            self.rect.x += self.speed_x
+            if self.rect.centery > 90*8:
+                print('dead inside')
+                for obj in all_sprites:
+                    obj.kill()
+            pygame.sprite.groupcollide(players, flags, False, True)
+
 
     def move(self, data=(0, 0)):
         dx, dy = data
@@ -126,14 +124,15 @@ class Lrud(pygame.sprite.Sprite):
         elif self.axis == 3:
             self.image = pygame.Surface((1, 78))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40 - int(self.objsx/2), self.y * 80 + 40))
-        # self.image.set_colorkey((0, 0, 0))
+        self.image.set_colorkey((0, 0, 0))
 
     def update(self):
-        if not self.cmfcs:
-            for obj in players:
-                self.speed_x, self.speed_y = obj.speed_x, obj.speed_y
-            self.rect.y += self.speed_y
-            self.rect.x += self.speed_x
+        if flags:
+            if not self.cmfcs:
+                for obj in players:
+                    self.speed_x, self.speed_y = obj.speed_x, obj.speed_y
+                self.rect.y += self.speed_y
+                self.rect.x += self.speed_x
 
     def checkcollide(self):
         if pygame.sprite.spritecollide(self, all_obstacles, False):
@@ -347,7 +346,11 @@ while running:
             lvl += 1
             LoadLvL(lvl, score)
         else:
-            print(f'Пройдена игра, ваш счет: {score}')
+            f = pygame.font.Font(None, 80)
+            txt1 = f.render(f'ПОБЕДА!', True, (255, 64, 255))
+            txt2 = f.render(f'СЧЕТ: {score}', True, (255, 64, 255))
+            screen.blit(txt1, (5*80, 4*80))
+            screen.blit(txt2, (5 * 80, 5 * 80))
     pygame.display.flip()
 '''Конец игрового цикла'''
 pygame.quit()
