@@ -36,28 +36,39 @@ class Player(pygame.sprite.Sprite):
             i, bool = obj.checkcollide()
             self.cl[i] = bool
         '''Движение вправо'''
-        if self.cl[1] and self.speed_x > -2:
-            self.speed_x += -2
+        if self.cl[1] and not self.cl[3]:
+            if self.speed_x > 1:
+                self.speed_x = -self.speed_x - 1
+            else:
+                self.speed_x += -1
         elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-            if self.speed_x < 10:
+            if self.speed_x < 12:
                 self.speed_x += 2
             if self.left:
                 self.left = False
                 self.image = pygame.transform.flip(self.image, True, False)
+        '''Help me brother i'm stuck!'''
+        if self.cl[0] and self.cl[1] and self.cl[2] and self.cl[3]:
+            if self.left:
+                c = 24
+            else:
+                c = -24
+            self.rect.x += c
+            for obj in helpers:
+                obj.rect.x += c
         '''Движение влево'''
-        if self.cl[3] and self.speed_x < 2:
-            self.speed_x += 2
+        if self.cl[3] and not self.cl[1]:
+            if self.speed_x < -1:
+                self.speed_x = -self.speed_x + 1
+            else:
+                self.speed_x += 1
         elif pygame.key.get_pressed()[pygame.K_LEFT]:
-            if self.speed_x > -10:
+            if self.speed_x > -12:
                 self.speed_x += -2
             if not self.left:
                 self.left = True
                 self.image = pygame.transform.flip(self.image, True, False)
         '''Торможение (Нехрен быть инертным)'''
-        if self.cl[2]:
-            if pygame.sprite.spritecollide(self, all_obstacles, False):
-                self.speed_y += -1
-            self.speed_y = 0
         if self.cl[0]:
             self.speed_y = -self.speed_y
         if self.speed_x > 0:
@@ -66,15 +77,15 @@ class Player(pygame.sprite.Sprite):
             self.speed_x += 1
         '''Свободное падение'''
         if not self.cl[2]:
-            if self.speed_y < 15:
+            if self.speed_y < 20:
                 self.speed_y += 1
-        elif pygame.key.get_pressed()[pygame.K_UP]:
-            self.speed_y = -20
         else:
             self.speed_y = 0
-        '''Столкновения'''
+        if pygame.key.get_pressed()[pygame.K_UP] and (not self.cl[3] and not self.cl[1] and self.cl[2]):
+            self.speed_y = -20
         if self.cl[2] and (self.cl[1] or self.cl[3]):
             self.speed_y += -1
+        '''Столкновения'''
         if pygame.sprite.groupcollide(players, coins, False, True):
             self.score += 10
             print(self.score)
@@ -84,22 +95,11 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += self.speed_y
         self.rect.x += self.speed_x
         if self.rect.centery > 90*8:
-            print('lol')
+            print('dead inside')
             for obj in all_sprites:
                 obj.kill()
         if pygame.sprite.groupcollide(players, flags, False, True):
-            for obj in flags:
-                obj.kill()
-        if self.left:
-            if self.rect.centerx >= 80*12:
-                self.cmfcsx = True
-            else:
-                self.cmfcsx = False
-        else:
-            if self.rect.centerx <= 80*4:
-                self.cmfcsx = True
-            else:
-                self.cmfcsx = False
+            print('nextlvl')
 
     def move(self, data=(0, 0)):
         dx, dy = data
@@ -116,20 +116,17 @@ class Lrud(pygame.sprite.Sprite):
         self.cmfcs = False
         if self.axis == 0:
             self.image = pygame.Surface((46, 1))
-            #self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40 - int(self.objsy/2) - 1))
         elif self.axis == 1:
             self.image = pygame.Surface((1, 78))
-            #self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40 + int(self.objsx/2), self.y * 80 + 40))
         elif self.axis == 2:
             self.image = pygame.Surface((46, 1))
-            #self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40 + int(self.objsy/2) + 1))
         elif self.axis == 3:
             self.image = pygame.Surface((1, 78))
-            #self.image.set_colorkey((0, 0, 0))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40 - int(self.objsx/2), self.y * 80 + 40))
+        # self.image.set_colorkey((0, 0, 0))
 
     def update(self):
         if not self.cmfcs:
@@ -199,15 +196,6 @@ class EndScreen(pygame.sprite.Sprite):
         self.width, self.height = size
         self.image = pygame.image.load(filename).convert_alpha()
         self.rect = self.image.get_rect(center=(self.width / 2, self.height / 2))
-'''        self.dx = 16
-        self.gn = True
-
-    def update(self):
-        if self.gn:
-            self.rect.x += self.dx
-            if self.rect.right >= self.width:
-                self.rect.right = self.width
-                self.gn = False'''
 
 
 class Flag(pygame.sprite.Sprite):
@@ -349,8 +337,6 @@ while running:
     helpers.update()
     for obj in players:
         score = obj.score
-    '''for obj in all_obstacles:
-        obj.move((-10, 0))'''
     if not all_sprites:
         end = True
         es = EndScreen("YP_data/Textures/endscreen.png", (16*80, 9*80))
