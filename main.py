@@ -69,10 +69,12 @@ class Player(pygame.sprite.Sprite):
             if self.speed_y < 15:
                 self.speed_y += 1
         elif pygame.key.get_pressed()[pygame.K_UP]:
-            self.speed_y = -15
+            self.speed_y = -20
         else:
             self.speed_y = 0
         '''Столкновения'''
+        if self.cl[2] and (self.cl[1] or self.cl[3]):
+            self.speed_y += -1
         if pygame.sprite.groupcollide(players, coins, False, True):
             self.score += 10
             print(self.score)
@@ -169,6 +171,15 @@ class Coin(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
 
+class Mushroom(pygame.sprite.Sprite):
+    def __init__(self, data=((0, 0), 'YP_data/Textures/mushroom.png', (80, 80), False)):
+        pygame.sprite.Sprite.__init__(self)
+        (self.x, self.y), filename, (self.width, self.height), self.left = data
+        self.image = pygame.image.load(filename).convert_alpha()
+        self.rect = self.image.get_rect(
+            center=(self.x * self.width + self.width / 2, self.y * self.height + self.height / 2))
+
+
 class Camera:
     '''Класс камеры'''
     def __init__(self, data=()):
@@ -259,6 +270,12 @@ def LoadLvL(lvl=1, score=0):
                 all_sprites.add(f)
                 all_obstacles.add(f)
                 flags.add(f)
+            elif lvl_map[y][x] == 'm':
+                data = ((x, y), 'YP_data/Textures/mushroom.png', (80, 80), False)
+                lvl_map[y][x] = data
+                obj = Mushroom(data)
+                all_sprites.add(obj)
+                all_entities.add(obj)
 
 
 pygame.init()
