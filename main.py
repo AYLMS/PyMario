@@ -176,7 +176,7 @@ class Coin(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
     def rotate(self):
-        self.image = pygame.transform.rotate(self.image, 180)
+        self.image = pygame.transform.flip(self.image, True, False)
 
 
 
