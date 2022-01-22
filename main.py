@@ -9,13 +9,11 @@ from dialog import get_level
 class Player(pygame.sprite.Sprite):
     '''Класс игрока'''
     def __init__(self, data=((0, 0), 'YP_data/Textures/mar.png', (160*8, 90*8), 0)):
-        # Переделывай всю физику игрока
         pygame.sprite.Sprite.__init__(self)
-        print(data)
         (self.x, self.y), filename, (self.width, self.height), score = data
         self.image = pygame.image.load(filename).convert_alpha()
-        self.rect = self.image.get_rect(center=(self.x * 80 + 40, self.y * 80 + 40))
-        '''Маска для колизий'''
+        self.x, self.y = self.x*80 + 40, self.y*80 + 40
+        self.rect = self.image.get_rect(center=(self.x, self.y))
         self.speed_x = 0
         self.speed_y = 0
         self.f1 = pygame.font.Font(None, 36)
@@ -27,77 +25,90 @@ class Player(pygame.sprite.Sprite):
         self.cl = [False, False, False, False]
 
     def update(self):
-        if flags:
-            if self.cmfcsx:
-                pass
-            for obj in helpers:
-                i, bool = obj.checkcollide()
-                self.cl[i] = bool
-            '''Движение вправо'''
-            if self.cl[1] and not self.cl[3]:
-                if self.speed_x > 1:
-                    self.speed_x = -self.speed_x - 1
-                else:
-                    self.speed_x += -1
-            elif pygame.key.get_pressed()[pygame.K_RIGHT]:
-                if self.speed_x < 12:
-                    self.speed_x += 2
-                if self.left:
-                    self.left = False
-                    self.image = pygame.transform.flip(self.image, True, False)
-            '''Help me brother i'm stuck!'''
-            if self.cl[0] and self.cl[1] and self.cl[2] and self.cl[3]:
-                if self.left:
-                    c = 24
-                else:
-                    c = -24
-                self.rect.x += c
-                for obj in helpers:
-                    obj.rect.x += c
-            '''Движение влево'''
-            if self.cl[3] and not self.cl[1]:
-                if self.speed_x < -1:
-                    self.speed_x = -self.speed_x + 1
-                else:
-                    self.speed_x += 1
-            elif pygame.key.get_pressed()[pygame.K_LEFT]:
-                if self.speed_x > -12:
-                    self.speed_x += -2
-                if not self.left:
-                    self.left = True
-                    self.image = pygame.transform.flip(self.image, True, False)
-            '''Торможение (Нехрен быть инертным)'''
-            if self.cl[0]:
-                self.speed_y = -self.speed_y
-            if self.speed_x > 0:
-                self.speed_x += -1
-            elif self.speed_x < 0:
-                self.speed_x += 1
-            '''Свободное падение'''
-            if not self.cl[2]:
-                if self.speed_y < 20:
-                    self.speed_y += 1
+        for obj in helpers:
+            i, bool = obj.checkcollide()
+            self.cl[i] = bool
+        '''Движение вправо'''
+        if self.cl[1] and not self.cl[3]:
+            if self.speed_x > 1:
+                self.speed_x = -self.speed_x - 1
             else:
-                self.speed_y = 0
-            if pygame.key.get_pressed()[pygame.K_UP] and (not self.cl[3] and not self.cl[1] and self.cl[2]):
-                self.speed_y = -20
-            if self.cl[2] and (self.cl[1] or self.cl[3]):
-                self.speed_y += -1
-            '''Столкновения'''
-            if pygame.sprite.groupcollide(players, coins, False, True):
-                self.score += 10
-                print(self.score)
-                self.text1 = self.f1.render(f'{self.score}', True,
-                                            (90, 90, 90))
-            screen.blit(self.text1, (15*80+40, 0))
-            self.rect.y += self.speed_y
+                self.speed_x += -1
+        elif pygame.key.get_pressed()[pygame.K_RIGHT]:
+            if self.speed_x < 12:
+                self.speed_x += 2
+            if self.left:
+                self.left = False
+                self.image = pygame.transform.flip(self.image, True, False)
+        '''Help me brother i'm stuck!'''
+        if self.cl[0] and self.cl[1] and self.cl[2] and self.cl[3]:
+            if self.left:
+                c = 24
+            else:
+                c = -24
+            self.rect.x += c
+            for obj in helpers:
+                obj.rect.x += c
+        '''Движение влево'''
+        if self.cl[3] and not self.cl[1]:
+            if self.speed_x < -1:
+                self.speed_x = -self.speed_x + 1
+            else:
+                self.speed_x += 1
+        elif pygame.key.get_pressed()[pygame.K_LEFT]:
+            if self.speed_x > -12:
+                self.speed_x += -2
+            if not self.left:
+                self.left = True
+                self.image = pygame.transform.flip(self.image, True, False)
+        '''Торможение (Нехрен быть инертным)'''
+        if self.cl[0]:
+            self.speed_y = -self.speed_y
+        if self.speed_x > 0:
+            self.speed_x += -1
+        elif self.speed_x < 0:
+            self.speed_x += 1
+        '''Свободное падение'''
+        if not self.cl[2]:
+            if self.speed_y < 20:
+                self.speed_y += 1
+        else:
+            self.speed_y = 0
+        if pygame.key.get_pressed()[pygame.K_UP] and (not self.cl[3] and not self.cl[1] and self.cl[2]):
+            self.speed_y = -20
+        if self.cl[2] and (self.cl[1] or self.cl[3]):
+            self.speed_y += -1
+        '''Столкновения'''
+        if pygame.sprite.groupcollide(players, coins, False, True):
+            self.score += 10
+            self.text1 = self.f1.render(f'{self.score}', True,
+                                        (90, 90, 90))
+        screen.blit(self.text1, (15*80+40, 0))
+        if self.rect.centerx >= 10 * 80 and not self.left and self.x <= self.width - 6*80:
+            for obj in all_shit:
+                obj.rect.x += -self.speed_x
+        elif self.rect.centerx <= 6*80 and self.left and self.x >= 6*80:
+            for obj in all_shit:
+                obj.rect.x += -self.speed_x
+        else:
             self.rect.x += self.speed_x
-            if self.rect.centery > 90*8:
-                print('dead inside')
-                for obj in all_sprites:
-                    obj.kill()
-            pygame.sprite.groupcollide(players, flags, False, True)
-
+        # if self.rect.centery <= 8*80 and self.speed_y < 0 and self.y <= self.height - 80:
+        #     for obj in all_shit:
+        #         obj.rect.y += -self.speed_y
+        # elif self.rect.centery >= 80 and self.speed_y > 0 and self.y <= self.height - 80:
+        #     for obj in all_shit:
+        #         obj.rect.y += -self.speed_y
+        # else:
+        #     self.rect.y += self.speed_y
+        self.rect.y += self.speed_y
+        self.y += self.speed_y
+        self.x += self.speed_x
+        if self.rect.centery > 9 * 80:
+            print('dead inside')
+            for obj in all_sprites:
+                obj.kill()
+        if pygame.sprite.groupcollide(players, flags, False, True):
+            print('nextlvl')
 
     def move(self, data=(0, 0)):
         dx, dy = data
@@ -127,12 +138,17 @@ class Lrud(pygame.sprite.Sprite):
         self.image.set_colorkey((0, 0, 0))
 
     def update(self):
-        if flags:
-            if not self.cmfcs:
-                for obj in players:
-                    self.speed_x, self.speed_y = obj.speed_x, obj.speed_y
-                self.rect.y += self.speed_y
-                self.rect.x += self.speed_x
+        for obj in players:
+            dx, dy = obj.rect.center
+            if self.axis == 0:
+                dy = obj.rect.centery - 41
+            elif self.axis == 1:
+                dx = obj.rect.centerx + 24
+            elif self.axis == 2:
+                dy = obj.rect.centery + 41
+            elif self.axis == 3:
+                dx = obj.rect.centerx - 24
+        self.rect.center = dx, dy
 
     def checkcollide(self):
         if pygame.sprite.spritecollide(self, all_obstacles, False):
@@ -222,47 +238,48 @@ def LoadLvL(lvl=1, score=0):
         for x in range(len(lvl_map[y])):
             if lvl_map[y][x] == '.':
                 data = ((x, y), 'YP_data/Textures/grass.png', (80, 80))
-                lvl_map[y][x] = data
                 obj = Obstacle(data)
                 all_sprites.add(obj)
+                all_obstacles.add(obj)
+                all_shit.add(obj)
             elif lvl_map[y][x] == '@':
                 '''подзагрузил игрока'''
-                data = ((x, y), 'YP_data/Textures/mar.png', (160 * 8, 90 * 8), score)
+                data = ((x, y), 'YP_data/Textures/mar.png', (80*len(lvl_map[-1]), 80*len(lvl_map)), score)
                 pl = Player(data)
                 players.add(pl)
                 all_entities.add(pl)
                 all_sprites.add(pl)
                 for i in range(4):
-                    data = ((x, y), (160*8, 90*8), (48, 80), i)
+                    data = ((x, y), (80*len(lvl_map[-1]), 80*len(lvl_map)), (48, 80), i)
                     helper = Lrud(data)
                     helpers.add(helper)
                     all_sprites.add(helper)
-                lvl_map[y][x] = data
             elif lvl_map[y][x] == '#':
                 data = ((x, y), 'YP_data/Textures/box.png', (80, 80))
-                lvl_map[y][x] = data
                 obj = Obstacle(data)
                 all_obstacles.add(obj)
                 all_sprites.add(obj)
+                all_shit.add(obj)
             elif lvl_map[y][x] == 'C':
                 data = ((x, y), 'YP_data/Textures/coin.png', (80, 80))
-                lvl_map[y][x] = data
                 coin = Coin(data)
                 all_sprites.add(coin)
                 coins.add(coin)
+                all_shit.add(coin)
             elif lvl_map[y][x] == 'F':
                 data = ((x, y), 'YP_data/Textures/flag.png', (80, 80))
-                lvl_map[y][x] = data
                 f = Flag(data)
                 all_sprites.add(f)
                 all_obstacles.add(f)
                 flags.add(f)
+                all_shit.add(f)
             elif lvl_map[y][x] == 'm':
                 data = ((x, y), 'YP_data/Textures/mushroom.png', (80, 80), False)
-                lvl_map[y][x] = data
                 obj = Mushroom(data)
                 all_sprites.add(obj)
                 all_entities.add(obj)
+                all_shit.add(obj)
+    return lvl
 
 
 pygame.init()
@@ -305,7 +322,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if end:
-                running = False
+                lvl = LoadLvL(1, 0)
+                end = False
                 break
             if event.key == pygame.K_SPACE:
                 for obj in players:
@@ -343,14 +361,9 @@ while running:
         all_entities.add(es)
     if not flags and end == False:
         if lvl < 2:
-            lvl += 1
-            LoadLvL(lvl, score)
+            lvl = LoadLvL(lvl + 1, score)
         else:
-            f = pygame.font.Font(None, 80)
-            txt1 = f.render(f'ПОБЕДА!', True, (255, 64, 255))
-            txt2 = f.render(f'СЧЕТ: {score}', True, (255, 64, 255))
-            screen.blit(txt1, (5*80, 4*80))
-            screen.blit(txt2, (5 * 80, 5 * 80))
+            print(f'Пройдена игра, ваш счет: {score}')
     pygame.display.flip()
 '''Конец игрового цикла'''
 pygame.quit()
