@@ -175,7 +175,7 @@ class Coin(pygame.sprite.Sprite):
         '''Маска для колизий'''
         self.mask = pygame.mask.from_surface(self.image)
 
-    def sdf(self):
+    def rotate(self):
         self.image = pygame.transform.rotate(self.image, 180)
 
 
@@ -355,7 +355,7 @@ while running:
         score = obj.score
     if fps_counter % 10 == 0:
         for coin in coins:
-            coin.sdf()
+            coin.rotate()
     if not all_sprites:
         end = True
         es = EndScreen("YP_data/Textures/endscreen.png", (16 * 80, 9 * 80))
