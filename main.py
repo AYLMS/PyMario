@@ -7,7 +7,7 @@ from dialog import get_level
 
 
 class Player(pygame.sprite.Sprite):
-    '''Класс игрока'''
+    """Класс игрока"""
 
     def __init__(self, data=((0, 0), 'YP_data/Textures/mar.png', (160 * 8, 90 * 8), 0)):
         pygame.sprite.Sprite.__init__(self)
@@ -29,7 +29,7 @@ class Player(pygame.sprite.Sprite):
         for obj in self.helpers:
             i, bool = obj.checkcollide(all_obstacles)
             self.cl[i] = bool
-        '''Движение вправо'''
+        """Движение вправо"""
         if self.cl[1] and not self.cl[3]:
             if self.speed_x > 1:
                 self.speed_x = -self.speed_x - 1
@@ -41,13 +41,13 @@ class Player(pygame.sprite.Sprite):
             if self.left:
                 self.left = False
                 self.image = pygame.transform.flip(self.image, True, False)
-        '''Help me brother i'm stuck!'''
+        """Help me brother i'm stuck!"""
         if self.cl[0] and self.cl[1] and self.cl[2] and self.cl[3]:
             c = 24 if self.left else -24
             self.rect.x += c
             for obj in self.helpers:
                 obj.rect.x += c
-        '''Движение влево'''
+        """Движение влево"""
         if self.cl[3] and not self.cl[1]:
             if self.speed_x < -1:
                 self.speed_x = -self.speed_x + 1
@@ -59,14 +59,14 @@ class Player(pygame.sprite.Sprite):
             if not self.left:
                 self.left = True
                 self.image = pygame.transform.flip(self.image, True, False)
-        '''Торможение (Нехрен быть инертным)'''
+        """Торможение (Нехрен быть инертным)"""
         if self.cl[0]:
             self.speed_y = -self.speed_y
         if self.speed_x > 0:
             self.speed_x += -1
         elif self.speed_x < 0:
             self.speed_x += 1
-        '''Свободное падение'''
+        """Свободное падение"""
         if self.cl[2]:
             self.speed_y = 0
         elif self.speed_y < 20:
@@ -75,7 +75,7 @@ class Player(pygame.sprite.Sprite):
             self.speed_y = -20
         if self.cl[2] and (self.cl[1] or self.cl[3]):
             self.speed_y += -1
-        '''Столкновения'''
+        """Столкновения"""
         if pygame.sprite.groupcollide(players, coins, False, True):
             self.score += 10
             self.text1 = self.f1.render(f'{self.score}', True,
@@ -124,7 +124,7 @@ class Lrud(pygame.sprite.Sprite):
         elif self.axis == 3:
             self.image = pygame.Surface((1, 78))
             self.rect = self.image.get_rect(center=(self.x * 80 + 40 - int(self.objsx / 2), self.y * 80 + 40))
-        # self.image.set_colorkey((0, 0, 0))
+        self.image.set_colorkey((0, 0, 0))
 
     def update(self):
         if self.group:
@@ -148,7 +148,7 @@ class Lrud(pygame.sprite.Sprite):
 
 
 class Obstacle(pygame.sprite.Sprite):
-    '''Класс препядствия'''
+    """Класс препядствия"""
 
     def __init__(self, data=((0, 0), 'YP_data/Textures/mar.png', (160 * 8, 90 * 8), False, [])):
         pygame.sprite.Sprite.__init__(self)
@@ -156,7 +156,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.image = pygame.image.load(filename).convert_alpha()
         self.rect = self.image.get_rect(
             center=(self.x * self.width + self.width / 2, self.y * self.height + self.height / 2))
-        '''Маска для колизий'''
+        """Маска для колизий"""
         self.helpers = pygame.sprite.Group()
 
     def update(self):
@@ -172,12 +172,11 @@ class Coin(pygame.sprite.Sprite):
         self.image = pygame.image.load(filename).convert_alpha()
         self.rect = self.image.get_rect(
             center=(self.x * self.width + self.width / 2, self.y * self.height + self.height / 2))
-        '''Маска для колизий'''
+        """Маска для колизий"""
         self.mask = pygame.mask.from_surface(self.image)
 
     def rotate(self):
         self.image = pygame.transform.flip(self.image, True, False)
-
 
 
 class Mushroom(pygame.sprite.Sprite):
@@ -190,7 +189,7 @@ class Mushroom(pygame.sprite.Sprite):
 
 
 class Camera:
-    '''Класс камеры'''
+    """Класс камеры"""
 
     def __init__(self, data=()):
         self.needmove_x, self.needmove_y = False, False
@@ -242,7 +241,7 @@ def LoadLvL(lvl=1, score=0):
                 all_obstacles.add(obj)
                 all_shit.add(obj)
             elif lvl_map[y][x] == '@':
-                '''подзагрузил игрока'''
+                """подзагрузил игрока"""
                 data = ((x, y), 'YP_data/Textures/mar.png', (80 * len(lvl_map[-1]), 80 * len(lvl_map)), score)
                 pl = Player(data)
                 players.add(pl)
@@ -292,7 +291,7 @@ def LoadLvL(lvl=1, score=0):
 
 
 pygame.init()
-'''Переменные'''
+"""Переменные"""
 app = QApplication(sys.argv)
 current_lvl, min_lvl, mx_lvl = 1, 1, 2
 lvl = get_level(app, current_lvl, min_lvl, mx_lvl)
@@ -314,21 +313,21 @@ players = pygame.sprite.Group()
 coins = pygame.sprite.Group()
 flags = pygame.sprite.Group()
 all_shit = pygame.sprite.Group()
-'''Предустановки к игровому циклу'''
+"""Предустановки к игровому циклу"""
 # Подгрузка уровня
 LoadLvL(lvl)
 # СОздание камеры
-'''cam = Camera()'''
+"""cam = Camera()"""
 screen.fill((192, 192, 255))
 running = True
 end = False
-'''Игровой цикл'''
+"""Игровой цикл"""
 fps_counter = 0
 while running:
     # Установка частоты обновления
     clock.tick(60)
     fps_counter += 1
-    '''Цикл действий'''
+    """Цикл действий"""
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if end:
@@ -343,10 +342,10 @@ while running:
                 if lvl != 1:
                     lvl += -1
                 LoadLvL(lvl)
-        '''Выход из игры'''
+        """Выход из игры"""
         if event.type == pygame.QUIT:
             running = False
-    '''Отрисовка объектов'''
+    """Отрисовка объектов"""
     screen.fill((192, 192, 255))
     # Спрайты
     all_sprites.draw(screen)
@@ -367,5 +366,5 @@ while running:
         else:
             print(f'Пройдена игра, ваш счет: {score}')
     pygame.display.flip()
-'''Конец игрового цикла'''
+"""Конец игрового цикла"""
 pygame.quit()
