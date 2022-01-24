@@ -13,10 +13,7 @@ class App(QWidget):
 
     def getInteger(self):
         i, okPressed = QInputDialog.getInt(self, "Select game level", "Level:", self.current, self.mn, self.mx)
-        if okPressed:
-            return i
-        else:
-            return False
+        return i if okPressed else False
 
 
 def get_level(app, current=1, mn=1, mx=2):
