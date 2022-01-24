@@ -300,6 +300,7 @@ while not lvl:
     lvl = get_level(app, current_lvl, min_lvl, mx_lvl)
 width, height = size = 160 * 8, 90 * 8
 screen = pygame.display.set_mode(size)
+pygame.display.set_caption('PyMario')
 clock = pygame.time.Clock()
 # Прямо ваапще все спрайты
 all_sprites = pygame.sprite.Group()
