@@ -85,10 +85,10 @@ class Player(pygame.sprite.Sprite):
             self.text1 = self.f1.render(f'{self.score}', True,
                                         (90, 90, 90))
         screen.blit(self.text1, (15 * 80 + 40, 0))
-        if self.x >= 10 * 80 and not self.left and self.x <= 16 * 80:
+        if 10 * 80 <= self.x <= (self.width - 6) * 80 and not self.left:
             for obj in all_shit:
                 obj.rect.x += -self.speed_x
-        elif self.rect.centerx <= 6 * 80 and self.left and self.x >= 6 * 80:
+        elif self.rect.centerx <= 6 * 80 <= self.x and self.left:
             for obj in all_shit:
                 obj.rect.x += -self.speed_x
         else:
