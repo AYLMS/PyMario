@@ -1,0 +1,106 @@
+name: Publish Release to GitHub
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  PYTHON_VERSION: '3.10.2'
+
+jobs:
+  build-windows:
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Package Application
+        run: pip install -r requirements.txt
+
+      - name: Build
+        run: pyinstaller --onefile --noconsole main.py -n PyMario --add-data "dialog.py;."
+
+      - name: Move
+        run: mv dist/PyMario.exe PyMario.exe
+      - name: Zip
+        run: tar.exe -a -c -f PyMario-Windows.zip PyMario.exe YP_data
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: PyMario-Windows
+          path: PyMario-Windows.zip
+
+  build-mac:
+
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Package Application
+        run: pip3 install -r requirements.txt
+
+      - name: Build
+        run: pyinstaller --onefile --noconsole main.py -n PyMario --add-data "dialog.py:."
+
+      - id: Zip
+        run: mv ./dist/PyMario.app PyMario.app && zip -r PyMario-MacOS.zip PyMario.app YP_data
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: PyMario-MacOS
+          path: PyMario-MacOS.zip
+
+  upload:
+
+    runs-on: ubuntu-latest
+    needs: [ build-windows, build-mac]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download Windows
+        uses: actions/download-artifact@v2
+        with:
+          name: PyMario-Windows
+          path: dist
+
+      - name: Download MacOS
+        uses: actions/download-artifact@v2
+        with:
+          name: PyMario-MacOS
+          path: dist
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: PyMario ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Windows Release Asset
+        id: upload-release-asset-wn
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/PyMario-Windows.zip
+          asset_name: PyMario-Windows.zip
+          asset_content_type: application/zip
+
+      - name: Upload MacOS Release Asset
+        id: upload-release-asset-mac
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/PyMario-MacOS.zip
+          asset_name: PyMario-MacOS.zip
+          asset_content_type: application/zip
