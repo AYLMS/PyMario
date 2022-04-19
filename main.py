@@ -43,10 +43,7 @@ class Player(pygame.sprite.Sprite):
                 self.image = pygame.transform.flip(self.image, True, False)
         '''Help me brother i'm stuck!'''
         if self.cl[0] and self.cl[1] and self.cl[2] and self.cl[3]:
-            if self.left:
-                c = 24
-            else:
-                c = -24
+            c = 24 if self.left else -24
             self.rect.x += c
             for obj in helpers:
                 obj.rect.x += c
@@ -70,11 +67,10 @@ class Player(pygame.sprite.Sprite):
         elif self.speed_x < 0:
             self.speed_x += 1
         '''Свободное падение'''
-        if not self.cl[2]:
-            if self.speed_y < 20:
-                self.speed_y += 1
-        else:
+        if self.cl[2]:
             self.speed_y = 0
+        elif self.speed_y < 20:
+            self.speed_y += 1
         if pygame.key.get_pressed()[pygame.K_UP] and (not self.cl[3] and not self.cl[1] and self.cl[2]):
             self.speed_y = -20
         if self.cl[2] and (self.cl[1] or self.cl[3]):
