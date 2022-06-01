@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import QApplication, QWidget, QInputDialog
 
 
 class App(QWidget):
-
     def __init__(self, current, mn, mx):
         super().__init__()
         self.current = current
@@ -12,7 +11,9 @@ class App(QWidget):
         self.mx = mx
 
     def getInteger(self):
-        i, okPressed = QInputDialog.getInt(self, "Select game level", "Level:", self.current, self.mn, self.mx)
+        i, okPressed = QInputDialog.getInt(
+            self, "Select game level", "Level:", self.current, self.mn, self.mx
+        )
         return i if okPressed else False
 
 
