@@ -32,4 +32,4 @@ python3 main.py
 
 * #### [Ocelot31](https://github.com/Ocelot31)
 * #### [lavender](https://github.com/fast-geek)
-* #### [Mikhail](https://github.com/krpff)
+* #### [Mickey](https://github.com/krpff)
